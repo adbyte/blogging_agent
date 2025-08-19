@@ -1,0 +1,483 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "9733816b-8597-4944-8d9d-1430dc74c647",
+      "name": "Telegram Trigger",
+      "webhookId": "bd7ff7a2-5ff2-40b7-8da4-2a3f85e0f007",
+      "credentials": {
+        "telegramApi": {
+          "id": "yTJ5TKZmYXODf5xj",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appW4mRHfF8675YBx",
+          "mode": "list",
+          "cachedResultName": "Agent Blog",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl5ztar2zHUzHLYR",
+          "mode": "list",
+          "cachedResultName": "Preferences",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx/tbl5ztar2zHUzHLYR"
+        },
+        "returnAll": false,
+        "limit": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        -64
+      ],
+      "id": "8bd56447-8bd3-4298-b486-2bbdbc13a68b",
+      "name": "preferences",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "i0rx56q8jxAWAggP",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appW4mRHfF8675YBx",
+          "mode": "list",
+          "cachedResultName": "Agent Blog",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblj9RwiCPtg1N9O6",
+          "mode": "list",
+          "cachedResultName": "Keywords",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx/tblj9RwiCPtg1N9O6"
+        },
+        "returnAll": false,
+        "limit": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        112
+      ],
+      "id": "8681aa81-bdaa-405e-b759-ac73b378d552",
+      "name": "keywords",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "i0rx56q8jxAWAggP",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "Preferences",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -64
+      ],
+      "id": "af38d717-717e-426c-be56-bd25149c4300",
+      "name": "Aggregate preferences"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "Keywords",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        128,
+        112
+      ],
+      "id": "ca90e02d-0800-4bba-bbbd-26800e68b6dd",
+      "name": "Aggregate keywords"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        0
+      ],
+      "id": "d5654cac-7cc4-4d4a-9531-c25ee13abbe9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=You are an expert AI Blog Post Generator.\n\nYour goal is to generate a complete, well-structured, and CONCISE blog post. The final output MUST be well under 4000 characters to be compatible with Telegram.\n\n**Inputs (for reference):**\n- Topic:{{ $('Telegram Trigger').item.json.message.text }}\n- Preferences: {{ $('Aggregate preferences').item.json.Preferences }}\n- Keywords: {{ $('Aggregate keywords').item.json.Keywords }}\n\n**Instructions:**\n\n1.  **Plan & Title:** Silently create a final, engaging title and a logical outline.\n\n2.  **Write Content:** Write a high-quality blog post.\n    * **CRITICAL LENGTH:** Keep the post concise, around **350-400 words**. This is essential to stay under the character limit.\n    * **Guidance:** Use the preferences (e.g., tone) to guide the style and naturally integrate the keywords for relevance.\n\n3.  **Apply Safe Markdown Formatting:**\n    * Use `#` for the title and `##` for section headings.\n    * Use `**bold text**` and `*italic text*`.\n    * **Final Check:** Ensure all Markdown formatting is valid and complete with no unclosed tags.\n\n4.  **Final Output:** Your response must be ONLY the final, complete blog post in a single block of valid Markdown text. Do not include any other text."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        0
+      ],
+      "id": "40db690e-32f8-43ef-b672-373c4b01d9d8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        208
+      ],
+      "id": "937cb2cb-6bc4-434b-95aa-3be52eddfed4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "76otXoFqvuPcfBaF",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        544,
+        208
+      ],
+      "id": "34676fc6-7538-4209-ad63-6f271afef4ba",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appW4mRHfF8675YBx",
+          "mode": "list",
+          "cachedResultName": "Agent Blog",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl5ztar2zHUzHLYR",
+          "mode": "list",
+          "cachedResultName": "Preferences",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx/tbl5ztar2zHUzHLYR"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Preference": "={{ $fromAI('add_preferences') }}"
+          },
+          "matchingColumns": [
+            "Preference"
+          ],
+          "schema": [
+            {
+              "id": "Preference",
+              "displayName": "Preference",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        272
+      ],
+      "id": "936b5e1b-808b-48bc-8432-c9de89d3ac4b",
+      "name": "add_preferences",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "i0rx56q8jxAWAggP",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appW4mRHfF8675YBx",
+          "mode": "list",
+          "cachedResultName": "Agent Blog",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblj9RwiCPtg1N9O6",
+          "mode": "list",
+          "cachedResultName": "Keywords",
+          "cachedResultUrl": "https://airtable.com/appW4mRHfF8675YBx/tblj9RwiCPtg1N9O6"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keywords": "{{ $fromAI('add_keywords') }}"
+          },
+          "matchingColumns": [
+            "Keywords"
+          ],
+          "schema": [
+            {
+              "id": "Keywords",
+              "displayName": "Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        176
+      ],
+      "id": "959ddd42-abbf-4335-aef3-f80ce0970f08",
+      "name": "add_keywords",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "i0rx56q8jxAWAggP",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "ba8c4e14-2d35-4ecb-b468-2206eba62f1e",
+      "name": "Send a text message",
+      "webhookId": "8c9ce515-b1ba-4a74-88a3-4a5f96016b68",
+      "credentials": {
+        "telegramApi": {
+          "id": "yTJ5TKZmYXODf5xj",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "preferences",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "preferences": {
+      "main": [
+        [
+          {
+            "node": "Aggregate preferences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "keywords": {
+      "main": [
+        [
+          {
+            "node": "Aggregate keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate preferences": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_preferences": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_keywords": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fb9fc568-d6cd-415a-ac5d-4fc0fc045470",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ee5d55c0c2a1553250ffa7bfa0a81ab8837c3fa5c7918b05377cc2f88350386e"
+  },
+  "id": "wypR33cwqjYCgsae",
+  "tags": [
+    {
+      "createdAt": "2025-08-18T07:00:18.772Z",
+      "updatedAt": "2025-08-18T07:00:18.772Z",
+      "id": "FYjVP6HkMHdRr0e7",
+      "name": "Content Generation"
+    }
+  ]
+}
