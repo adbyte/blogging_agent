@@ -1,103 +1,80 @@
-🤖 AI Blog Post Automation Agent (n8n + Telegram + Airtable)
-This repository contains an n8n workflow that functions as an AI-powered agent to automate the creation of structured, high-quality blog posts. The agent interacts with users via Telegram, uses an AI/LLM for content generation, and stores user preferences in an Airtable base for personalized output.
+# 🤖 AI Blog Post Automation Agent (n8n + Telegram + Airtable)
 
-✨ Features
-Conversational Interface: Interact with the agent naturally through a Telegram bot.
+This repository contains an **n8n workflow** that functions as an AI-powered agent to automate the creation of structured, high-quality blog posts.  
 
-End-to-End Content Creation: Provide a blog title and receive a full outline, followed by a complete, well-structured blog post.
+The agent interacts with users via **Telegram**, uses an **AI/LLM** for content generation, and stores user preferences in **Airtable** for personalized output.
 
-Personalized Output: Store and manage preferences like writing tone (e.g., "professional," "casual") and specific keywords to be included in the content.
+---
 
-Dynamic Preference Management: Use simple commands directly in Telegram (/add_preference, /add_keyword) to update your settings in real-time.
+## ✨ Features
 
-Structured Formatting: The final blog post is delivered in clean markdown with proper headings and structure, ready to be published.
+- **Conversational Interface** – Interact with the agent naturally through a Telegram bot.  
+- **End-to-End Content Creation** – Provide a blog title and receive a full outline, followed by a complete, well-structured blog post.  
+- **Personalized Output** – Store and manage preferences like writing tone (e.g., "professional," "casual") and specific keywords to be included in the content.  
+- **Dynamic Preference Management** – Use simple commands directly in Telegram (`/add_preference`, `/add_keyword`) to update your settings in real-time.  
+- **Structured Formatting** – The final blog post is delivered in clean markdown with proper headings and structure, ready to be published.  
+- **Extensible** – Built on **n8n**, making it easy to modify, add new tools, or integrate with other services.  
 
-Extensible: Built on n8n, making it easy to modify, add new tools, or integrate with other services.
+---
 
-⚙️ How It Works
-![Blog Agent Workflow](blog_agent_workflow.png)
-The workflow follows a logical sequence triggered by a user message in Telegram. Below is a visual representation of the agent's logic.
+## ⚙️ How It Works
 
-User Input: The user sends a blog title to the Telegram bot.
+![Blog Agent Workflow](blog%20agent%20workflow.png)
 
-Preference Retrieval: The workflow queries an Airtable base to retrieve the user's saved preferences (tone, keywords).
+The workflow follows a logical sequence triggered by a user message in Telegram:
 
-Outline Generation: The blog title and retrieved preferences are sent to an AI/LLM (e.g., OpenAI's GPT-4) with a specific prompt to generate a detailed blog post outline.
+1. **User Input** – The user sends a blog title to the Telegram bot.  
+2. **Preference Retrieval** – The workflow queries an Airtable base to retrieve the user's saved preferences (tone, keywords).  
+3. **Outline Generation** – The blog title and retrieved preferences are sent to an AI/LLM (e.g., OpenAI's GPT-4) with a structured prompt to generate a detailed blog post outline.  
+4. **Outline Delivery** – The generated outline is sent back to the user via Telegram for review.  
+5. **Full Content Generation** – The workflow uses the title, outline, and preferences to generate a ~1000-word blog post.  
+6. **Final Delivery** – The completed markdown blog post is delivered in Telegram.  
+7. **Command Handling** – `/add_preference` and `/add_keyword` commands update preferences in Airtable and confirm with the user.  
 
-Outline Delivery: The generated outline is sent back to the user via Telegram for review.
+---
 
-Full Content Generation: The workflow uses the original title, the generated outline, and the user preferences to prompt the AI/LLM to write the full blog post (approx. 1000 words).
+## 🛠️ Components Used
 
-Final Delivery: The complete, markdown-formatted blog post is sent to the user in Telegram.
+- **[n8n](https://n8n.io/)** – Core automation platform orchestrating the workflow  
+- **[Telegram](https://core.telegram.org/bots/api)** – Conversational interface with the user  
+- **[Airtable](https://airtable.com/)** – Database for storing and managing preferences  
+- **AI/LLM (e.g., OpenAI, Anthropic, Gemini)** – Content generation engine  
 
-Tool/Command Handling: The workflow includes a router that listens for specific commands (/add_preference and /add_keyword). When a command is detected, it triggers a separate path to add the specified data to the correct field in the Airtable base, confirming the update with the user.
+---
 
-🛠️ Components Used
-n8n: The core automation platform that orchestrates the workflow.
+## 🚀 Setup & Configuration
 
-Telegram: Serves as the user interface for interaction.
+### 1. Airtable Base
+Create a new Airtable base with a table named **`User Preferences`**. The table should have these fields:  
 
-Airtable: Acts as a simple database to store and manage user preferences.
+- `UserID` *(Single line text)* – stores the Telegram User ID (primary key).  
+- `Tone` *(Single line text)* – desired writing tone (e.g., Professional, Casual, Witty).  
+- `Keywords` *(Long text)* – comma-separated list of keywords.  
 
-AI / LLM: Any large language model provider compatible with n8n (e.g., OpenAI, Anthropic, Google Gemini) for content generation.
+---
 
-🚀 Setup & Configuration
-To get this workflow running, you will need to configure the following:
+### 2. n8n Credentials
+Configure the following in your n8n instance:  
 
-1. Airtable Base:
-Create a new Airtable base with a table named "User Preferences". The table should have the following fields:
+- **Telegram Bot** – Get API token from [BotFather](https://core.telegram.org/bots#botfather).  
+- **Airtable** – Use your Airtable API key.  
+- **AI/LLM Provider** – API key for your model (e.g., OpenAI).  
 
-UserID (Single line text): To store the Telegram User ID. This will be the primary key.
+---
 
-Tone (Single line text): To store the desired writing tone (e.g., "Professional", "Witty", "Informative").
+### 3. Workflow Configuration
+1. Import the `workflow.json` into n8n.  
+2. Connect your credentials in the respective nodes:  
+   - **Telegram Trigger Node** → Telegram Bot  
+   - **Airtable Nodes** → Airtable Base + Table `User Preferences`  
+   - **LLM Nodes** → AI/LLM provider  
+3. Review & adjust prompts in the **Generate Outline** and **Generate Full Blog** nodes.  
 
-Keywords (Long text): To store a comma-separated list of keywords to include in the blog post.
+---
 
-2. n8n Credentials:
-In your n8n instance, configure the credentials for the following services:
+## 💬 Usage
 
-Telegram Bot: You will need the API token from Telegram's BotFather.
-
-Airtable: You will need your Airtable API key.
-
-AI/LLM Provider: You will need the API key for your chosen language model (e.g., OpenAI API key).
-
-3. Workflow Configuration:
-
-Import the workflow.json file into your n8n instance.
-
-Telegram Trigger Node: Connect your Telegram Bot credential.
-
-Airtable Nodes:
-
-Connect your Airtable credential.
-
-Select your "Blog Agent" base and the "User Preferences" table.
-
-Ensure the UserID from the Telegram trigger is used to look up and update records.
-
-LLM Nodes:
-
-Connect your AI/LLM provider credential.
-
-Review and adjust the prompts in the "Generate Outline" and "Generate Full Blog" nodes to better suit your needs.
-
-💬 Usage
-Interact with the agent through your Telegram bot.
-
-To Generate a Blog Post:
-Simply send the title of the blog post you want to create.
-Example: The Future of Renewable Energy in Urban Environments
-
-To Manage Preferences:
-Use the following commands to update your settings stored in Airtable.
-
-Add/Update Writing Tone:
-/add_preference <Your-Preference>
-Example: /add_preference Professional and Authoritative
-
-Add Keywords:
-/add_keyword <comma-separated, keywords>
-Example: /add_keyword solar power, wind turbines, smart grids, sustainability
-
-The agent will confirm once your preferences have been updated. The next blog post you generate will use these new settings.
+### Generate a Blog Post
+Simply send the blog title to your Telegram bot.  
+```text
+The Future of Renewable Energy in Urban Environments
