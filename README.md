@@ -78,3 +78,10 @@ Configure the following in your n8n instance:
 Simply send the blog title to your Telegram bot.  
 ```text
 The Future of Renewable Energy in Urban Environments
+```
+
+You will receive:
+
+A blog outline
+
+A full, markdown-formatted blog post (~1000 words)
